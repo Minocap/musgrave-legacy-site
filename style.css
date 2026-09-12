@@ -1,0 +1,209 @@
+/* ============================================================
+   SHARED STYLESHEET
+   Every page links to this one file, so a change here (colors,
+   fonts, spacing) updates the whole site at once. Edit the
+   :root variables below to retheme everything in one place.
+   ============================================================ */
+
+:root {
+  --ink: #241c14;
+  --parchment: #e9dfc6;
+  --parchment-dim: #d8cbaa;
+  --wood: #3a2c1e;
+  --candle: #c9a15f;
+  --burgundy: #6d2a34;
+  --line: #cbb98a;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--wood);
+  background-image:
+    radial-gradient(circle at 20% 10%, rgba(201,161,95,0.08), transparent 45%),
+    radial-gradient(circle at 80% 90%, rgba(109,42,52,0.10), transparent 50%);
+  color: var(--parchment);
+  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  min-height: 100vh;
+  padding: 32px 16px 64px;
+}
+
+.page {
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.case-ref {
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--candle);
+  margin: 0 0 6px;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0 0 10px;
+  line-height: 1.25;
+}
+
+h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+p {
+  line-height: 1.6;
+  color: var(--parchment-dim);
+}
+
+a {
+  color: var(--candle);
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 22px;
+  font-size: 14px;
+  color: var(--candle);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+.back-link:hover { border-bottom-color: var(--candle); }
+
+.divider {
+  border: none;
+  border-top: 2px solid var(--line);
+  margin: 18px 0 26px;
+}
+
+/* Card grid, used on the landing page and roster page */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.card {
+  background: rgba(0,0,0,0.18);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--burgundy);
+  border-radius: 2px;
+  padding: 16px 18px;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.card:hover {
+  background: rgba(0,0,0,0.28);
+}
+
+.card .card-title {
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  color: var(--candle);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.card h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+
+.card p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* ============================================================
+   PORTRAIT POPUP (used on the Roster page)
+   Clicking a name fades the portrait into view over a dark
+   backdrop, rather than navigating to a new page.
+   ============================================================ */
+
+.name-link {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0 0 6px;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--parchment);
+  cursor: pointer;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 3px;
+}
+.name-link:hover { color: var(--candle); text-decoration-color: var(--candle); }
+
+.portrait-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 7, 4, 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 100;
+  visibility: hidden;
+  pointer-events: none;
+  transition: background 0.45s ease, visibility 0s linear 0.45s;
+}
+.portrait-modal.open {
+  background: rgba(10, 7, 4, 0.82);
+  visibility: visible;
+  pointer-events: auto;
+  transition: background 0.45s ease;
+}
+
+.portrait-modal-inner {
+  position: relative;
+  max-width: 420px;
+  width: 100%;
+  opacity: 0;
+  transform: scale(0.94);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+.portrait-modal.open .portrait-modal-inner {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.portrait-modal img {
+  width: 100%;
+  display: block;
+  border-radius: 2px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.portrait-modal-caption {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--parchment-dim);
+}
+
+.portrait-modal-close {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--burgundy);
+  color: var(--parchment);
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.portrait-modal-close:hover { background: #832f3c; }

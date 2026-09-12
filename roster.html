@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Irregulars Roster — The Musgrave Legacy</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="page">
+
+  <a class="back-link" href="index.html">&larr; Back</a>
+  <p class="case-ref">DOSSIER</p>
+  <h1>Irregulars Roster</h1>
+  <p>The six operatives called back into active service. Click a name to see them.</p>
+
+  <hr class="divider">
+
+  <!--
+    Six cards, one per Irregular. The name is a button (not a link) that
+    opens the portrait popup at the bottom of the page — data-portrait
+    points at the image file, data-name is the caption shown under it.
+    Edit the paragraph text as your story develops; swap the portrait
+    file in /portraits/ any time without touching this markup.
+  -->
+  <div class="card-grid">
+
+    <div class="card">
+      <span class="card-title">OPERATIVE</span>
+      <button class="name-link" data-portrait="portraits/doyle.png" data-name='Mickey "Frenchie" Doyle'>Mickey "Frenchie" Doyle</button>
+      <p>Continental connections; traces Rachel Howells' disappearance abroad.</p>
+    </div>
+
+    <div class="card">
+      <span class="card-title">OPERATIVE</span>
+      <button class="name-link" data-portrait="portraits/duggan.png" data-name="Pidge Duggan">Pidge Duggan</button>
+      <p>Irish, Glasgow ties, a smuggling background; works the archive and military thread.</p>
+    </div>
+
+    <div class="card">
+      <span class="card-title">OPERATIVE</span>
+      <button class="name-link" data-portrait="portraits/marsh.png" data-name='Effie "Inkwell" Marsh'>Effie "Inkwell" Marsh</button>
+      <p>Works at The Strand Magazine; an eye for forgery.</p>
+    </div>
+
+    <div class="card">
+      <span class="card-title">OPERATIVE</span>
+      <button class="name-link" data-portrait="portraits/gallagher.png" data-name='Nell "Sparrow" Gallagher'>Nell "Sparrow" Gallagher</button>
+      <p>Agile and quick; physically retraces the ritual's steps.</p>
+    </div>
+
+    <div class="card">
+      <span class="card-title">OPERATIVE</span>
+      <button class="name-link" data-portrait="portraits/hale.png" data-name='Dot "the Confessor" Hale'>Dot "the Confessor" Hale</button>
+      <p>A modiste's fitter; reads fashion and social detail others miss.</p>
+    </div>
+
+    <div class="card">
+      <span class="card-title">OPERATIVE</span>
+      <button class="name-link" data-portrait="portraits/whitfield.png" data-name='Tam "the Digger" Whitfield'>Tam "the Digger" Whitfield</button>
+      <p>Classicist and archaeologist; the British Museum and Rosetta Stone thread.</p>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Portrait popup: hidden by default, faded/scaled in via the .open class -->
+<div class="portrait-modal" id="portrait-modal">
+  <div class="portrait-modal-inner">
+    <button class="portrait-modal-close" id="portrait-modal-close" aria-label="Close">&#10005;</button>
+    <img id="portrait-modal-img" src="" alt="">
+    <p class="portrait-modal-caption" id="portrait-modal-caption"></p>
+  </div>
+</div>
+
+<script>
+  const modal = document.getElementById("portrait-modal");
+  const modalImg = document.getElementById("portrait-modal-img");
+  const modalCaption = document.getElementById("portrait-modal-caption");
+
+  document.querySelectorAll(".name-link").forEach(btn => {
+    btn.addEventListener("click", () => {
+      modalImg.src = btn.dataset.portrait;
+      modalImg.alt = btn.dataset.name;
+      modalCaption.textContent = btn.dataset.name;
+      modal.classList.add("open");
+    });
+  });
+
+  function closeModal() { modal.classList.remove("open"); }
+
+  document.getElementById("portrait-modal-close").addEventListener("click", closeModal);
+  modal.addEventListener("click", e => {
+    if (e.target === modal) closeModal(); // click on backdrop, not the image
+  });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") closeModal();
+  });
+</script>
+
+</body>
+</html>
