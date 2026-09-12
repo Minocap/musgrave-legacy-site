@@ -155,6 +155,7 @@ a {
   visibility: hidden;
   pointer-events: none;
   transition: background 0.45s ease, visibility 0s linear 0.45s;
+  overflow-y: auto; /* fallback: scroll on very small screens instead of clipping */
 }
 .portrait-modal.open {
   background: rgba(10, 7, 4, 0.82);
@@ -167,6 +168,13 @@ a {
   position: relative;
   max-width: 420px;
   width: 100%;
+  /* Cap height to the viewport (minus the padding above) so the image
+     scales DOWN to fit whole, rather than overflowing and getting
+     clipped by the fixed-position overlay. */
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  margin: auto; /* keeps it centered even when shorter than the flex container */
   opacity: 0;
   transform: scale(0.94);
   transition: opacity 0.45s ease, transform 0.45s ease;
@@ -177,8 +185,15 @@ a {
 }
 
 .portrait-modal img {
-  width: 100%;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  /* Leave room for the caption below; image shrinks to fit rather
+     than being cropped by the container. */
+  max-height: calc(100vh - 48px - 40px);
+  object-fit: contain;
   display: block;
+  margin: 0 auto;
   border-radius: 2px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.5);
 }
@@ -188,6 +203,7 @@ a {
   margin-top: 12px;
   font-size: 14px;
   color: var(--parchment-dim);
+  flex-shrink: 0;
 }
 
 .portrait-modal-close {
