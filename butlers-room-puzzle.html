@@ -5,65 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title>MR-1895 — Exhibit: The Under-Butler's Chamber</title>
+<link rel="stylesheet" href="style.css">
 <style>
-  :root {
-    --ink: #241c14;
-    --parchment: #e9dfc6;
-    --parchment-dim: #d8cbaa;
-    --wood: #3a2c1e;
-    --candle: #c9a15f;
-    --burgundy: #6d2a34;
-    --line: #cbb98a;
-  }
-
-  * { box-sizing: border-box; }
-
-  body {
-    margin: 0;
-    background: var(--wood);
-    background-image:
-      radial-gradient(circle at 20% 10%, rgba(201,161,95,0.08), transparent 45%),
-      radial-gradient(circle at 80% 90%, rgba(109,42,52,0.10), transparent 50%);
-    color: var(--parchment);
-    font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    padding: 32px 16px 64px;
-  }
-
-  .sheet {
-    max-width: 760px;
-    width: 100%;
-  }
-
-  .case-header {
-    border-bottom: 2px solid var(--line);
-    padding-bottom: 14px;
-    margin-bottom: 22px;
-  }
-
-  .case-ref {
-    font-size: 13px;
-    letter-spacing: 0.04em;
-    color: var(--candle);
-    margin: 0 0 6px;
-  }
-
-  h1 {
-    font-size: 26px;
-    font-weight: 600;
-    margin: 0 0 8px;
-    line-height: 1.25;
-  }
-
-  .instruction {
-    font-size: 15px;
-    color: var(--parchment-dim);
-    margin: 0;
-    max-width: 60ch;
-  }
-
   .room-wrap {
     position: relative;
     background: #1d1710;
@@ -71,35 +14,53 @@
     border-radius: 2px;
     padding: 10px;
     margin: 26px 0;
+    line-height: 0;
   }
 
-  svg { display: block; width: 100%; height: auto; }
+  .room-wrap img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 1px;
+  }
 
   .hotspot {
+    position: absolute;
+    border: 1.5px dashed transparent;
+    border-radius: 3px;
     cursor: pointer;
-    fill: transparent;
-    stroke: var(--candle);
-    stroke-width: 1.5;
-    stroke-dasharray: 4 3;
-    opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: border-color 0.2s ease, background 0.2s ease;
   }
-  .hotspot:hover, .hotspot.examined { opacity: 0.9; }
-  .hotspot.examined { stroke: var(--burgundy); }
+  .hotspot:hover,
+  .hotspot:focus-visible {
+    border-color: var(--candle);
+    background: rgba(201, 161, 95, 0.10);
+  }
+  .hotspot.examined {
+    border-color: var(--burgundy);
+  }
+  .hotspot.examined.evidence {
+    border-color: #8fae7a;
+  }
 
-  .hotspot-label {
+  .hotspot-tag {
+    position: absolute;
+    bottom: -22px;
+    left: 0;
     font-size: 11px;
-    fill: var(--candle);
+    color: var(--candle);
+    background: rgba(0,0,0,0.6);
+    padding: 2px 6px;
+    border-radius: 2px;
+    white-space: nowrap;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease;
-    text-transform: none;
   }
-  .hotspot:hover + .hotspot-label { opacity: 1; }
+  .hotspot:hover .hotspot-tag,
+  .hotspot:focus-visible .hotspot-tag { opacity: 1; }
 
-  .clue-log {
-    margin-top: 6px;
-  }
+  .clue-log { margin-top: 6px; }
 
   .clue-card {
     display: none;
@@ -109,14 +70,27 @@
     margin-bottom: 10px;
     font-size: 14.5px;
     line-height: 1.55;
+    color: var(--parchment);
   }
   .clue-card.visible { display: block; }
+  .clue-card.evidence { border-left-color: #8fae7a; }
+
   .clue-card .clue-title {
     display: block;
     font-size: 12px;
     letter-spacing: 0.03em;
     color: var(--candle);
     margin-bottom: 4px;
+  }
+  .clue-card.evidence .clue-title::after {
+    content: "  —  EVIDENCE";
+    color: #8fae7a;
+  }
+
+  .progress-note {
+    font-size: 13px;
+    color: var(--parchment-dim);
+    margin: -8px 0 18px;
   }
 
   .answer-block {
@@ -127,16 +101,9 @@
   }
   .answer-block.ready { display: block; }
 
-  .answer-prompt {
-    font-size: 15px;
-    margin-bottom: 12px;
-  }
+  .answer-prompt { font-size: 15px; margin-bottom: 12px; color: var(--parchment); }
 
-  .answer-row {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
+  .answer-row { display: flex; gap: 10px; flex-wrap: wrap; }
 
   input[type="text"] {
     flex: 1;
@@ -162,103 +129,116 @@
   }
   button:hover { background: #832f3c; }
 
-  .feedback {
-    margin-top: 12px;
-    font-size: 14.5px;
-    min-height: 20px;
-  }
+  .feedback { margin-top: 12px; font-size: 14.5px; min-height: 20px; }
   .feedback.correct { color: #8fae7a; }
   .feedback.incorrect { color: #c98a6b; }
 </style>
 </head>
 <body>
-<div class="sheet">
+<div class="page">
 
-  <a href="puzzles.html" style="display:inline-block; margin-bottom:18px; font-size:14px; color:var(--candle); text-decoration:none;">&larr; Back to Puzzles</a>
+  <a class="back-link" href="puzzles.html">&larr; Back to Puzzles</a>
 
-  <div class="case-header">
-    <p class="case-ref">CASE REF: MR-1895-04 &nbsp;|&nbsp; EXHIBIT A</p>
-    <h1>The Under-Butler's Chamber</h1>
-    <p class="instruction">
-      Move your cursor over the room to examine it closely. Three details have
-      been marked for inspection. Click each one to record what you find,
-      then submit your conclusion below.
-    </p>
-  </div>
+  <p class="case-ref">CASE REF: MR-1895-04 &nbsp;|&nbsp; EXHIBIT A</p>
+  <h1>The Under-Butler's Chamber</h1>
+  <p>
+    Move your cursor over the room to see where a search might turn up
+    something. Click each spot to record what you find, then submit your
+    conclusion below.
+  </p>
 
-  <!--
-    ROOM DIAGRAM — placeholder ink-sketch built in SVG so the puzzle works
-    with no image file at all. To swap in your real illustration instead:
-    delete the <svg>...</svg> block below and replace it with:
-      <img src="your-room-image.jpg" style="width:100%; display:block;">
-    Then re-position the three <div class="hotspot-overlay"> hit areas
-    (search for HOTSPOT 1 / 2 / 3 below) using percentage left/top/width/height
-    so they sit over the right spots on your real image.
-  -->
+  <hr class="divider">
+
   <div class="room-wrap">
-    <svg viewBox="0 0 700 460" xmlns="http://www.w3.org/2000/svg">
-      <rect x="0" y="0" width="700" height="460" fill="#1d1710"/>
-      <!-- sloped attic ceiling -->
-      <polygon points="0,0 700,0 700,90 0,140" fill="none" stroke="#8a7550" stroke-width="1.5"/>
-      <line x1="0" y1="140" x2="700" y2="90" stroke="#8a7550" stroke-width="1"/>
-      <!-- bed -->
-      <rect x="60" y="230" width="220" height="110" rx="4" fill="none" stroke="#8a7550" stroke-width="1.5"/>
-      <line x1="60" y1="260" x2="280" y2="260" stroke="#8a7550" stroke-width="1"/>
-      <!-- trunk, corner -->
-      <rect x="520" y="300" width="110" height="70" rx="3" fill="none" stroke="#8a7550" stroke-width="1.5"/>
-      <line x1="520" y1="318" x2="630" y2="318" stroke="#8a7550" stroke-width="1"/>
-      <!-- chest of drawers -->
-      <rect x="440" y="60" width="120" height="150" fill="none" stroke="#8a7550" stroke-width="1.5"/>
-      <line x1="440" y1="110" x2="560" y2="110" stroke="#8a7550" stroke-width="1"/>
-      <line x1="440" y1="160" x2="560" y2="160" stroke="#8a7550" stroke-width="1"/>
-      <rect x="452" y="160" width="40" height="45" fill="none" stroke="#c9a15f" stroke-width="1"/>
-      <!-- floorboard near bed, slightly darker plank -->
-      <rect x="120" y="360" width="90" height="26" fill="#241c14" opacity="0.5"/>
+    <img src="puzzles/butlers-room.png" alt="The under-butler's spartan bedroom — a coat hook, washstand, dresser, bed, trunk, mantel, and floor are all visible.">
 
-      <!-- HOTSPOT 1: trunk -->
-      <rect class="hotspot" data-clue="trunk" x="520" y="300" width="110" height="70" rx="3"/>
-      <text class="hotspot-label" x="520" y="295">Examine the trunk</text>
+    <div class="hotspot" data-clue="hook" style="left:12%; top:23%; width:9%; height:26%;">
+      <span class="hotspot-tag">Coat on the hook</span>
+    </div>
 
-      <!-- HOTSPOT 2: floorboard -->
-      <rect class="hotspot" data-clue="floorboard" x="120" y="360" width="90" height="26"/>
-      <text class="hotspot-label" x="120" y="404">Examine the floorboard</text>
+    <div class="hotspot" data-clue="washstand" style="left:10%; top:52%; width:15%; height:30%;">
+      <span class="hotspot-tag">Washstand</span>
+    </div>
 
-      <!-- HOTSPOT 3: drawer -->
-      <rect class="hotspot" data-clue="drawer" x="452" y="160" width="40" height="45"/>
-      <text class="hotspot-label" x="452" y="222">Examine the drawer</text>
-    </svg>
+    <div class="hotspot" data-clue="drawers" style="left:29%; top:37%; width:11%; height:29%;">
+      <span class="hotspot-tag">Chest of drawers</span>
+    </div>
+
+    <div class="hotspot" data-clue="mattress" style="left:45%; top:43%; width:29%; height:22%;">
+      <span class="hotspot-tag">Bed &amp; mattress</span>
+    </div>
+
+    <div class="hotspot" data-clue="trunk" style="left:43%; top:63%; width:13%; height:14%;">
+      <span class="hotspot-tag">Trunk</span>
+    </div>
+
+    <div class="hotspot" data-clue="mantel" style="left:74%; top:36%; width:10%; height:10%;">
+      <span class="hotspot-tag">Mantel shelf</span>
+    </div>
+
+    <div class="hotspot" data-clue="floorboard" style="left:62%; top:70%; width:16%; height:12%;">
+      <span class="hotspot-tag">The floor, near the hearth</span>
+    </div>
+
   </div>
+
+  <p class="progress-note" id="progress-note">0 of 7 spots examined.</p>
 
   <div class="clue-log">
-    <!--
-      CLUE TEXT — edit the sentence inside each .clue-card to your real
-      clue content. The clue-title is just a small caption label.
-    -->
+
+    <div class="clue-card" id="clue-hook">
+      <span class="clue-title">THE COAT HOOK</span>
+      A worn work jacket, nothing in the pockets but a stub of pencil and a
+      few crumbs of tobacco. Unremarkable.
+    </div>
+
+    <div class="clue-card" id="clue-washstand">
+      <span class="clue-title">THE WASHSTAND</span>
+      A chipped basin and pitcher, water gone cold. The soap is worn down
+      to a sliver — a man who washes carefully, that's all.
+    </div>
+
+    <div class="clue-card evidence" id="clue-drawers">
+      <span class="clue-title">THE CHEST OF DRAWERS</span>
+      Folded shirts, a spare collar, a waistcoat pushed to the back. The
+      waistcoat's lining has been unpicked and re-sewn along one seam —
+      clumsily, in a thread that doesn't match. Inside: a torn corner of
+      paper, hand-ruled with figures in a careful, surveyor's hand.
+    </div>
+
+    <div class="clue-card" id="clue-mattress">
+      <span class="clue-title">THE MATTRESS</span>
+      Something hard beneath the ticking. A small flask, drink long since
+      evaporated to a sour residue. A private vice, perhaps — but not the
+      one you're looking for.
+    </div>
+
     <div class="clue-card" id="clue-trunk">
       <span class="clue-title">THE TRUNK</span>
-      Beneath a folded coat, the lining has been recently unpicked and
-      re-stitched with thread that doesn't match.
+      A spare pair of boots, a Bible with a cracked spine, a bundle of old
+      letters tied with string and long since read to pieces. Nothing
+      hidden here.
     </div>
-    <div class="clue-card" id="clue-floorboard">
-      <span class="clue-title">THE FLOORBOARD</span>
-      One plank sits slightly proud of its neighbours, its nail heads
-      scratched as though lifted and replaced more than once.
+
+    <div class="clue-card" id="clue-mantel">
+      <span class="clue-title">THE MANTEL SHELF</span>
+      A single dried flower, pressed flat and kept long past its bloom.
+      Sentiment, most likely — a keepsake, not a clue.
     </div>
-    <div class="clue-card" id="clue-drawer">
-      <span class="clue-title">THE DRAWER</span>
-      A small brass key, too fine for any lock in this room, is tucked
-      beneath a folded handkerchief.
+
+    <div class="clue-card evidence" id="clue-floorboard">
+      <span class="clue-title">THE FLOOR, NEAR THE HEARTH</span>
+      One board sits a shade lighter than its neighbours — lifted and
+      replaced more than once. Beneath it: a small brown bottle, half
+      empty, and a chemist's receipt. The printed address reads
+      <em>Wardour Street</em>.
     </div>
+
   </div>
 
-  <!--
-    ANSWER — edit the question text and the list of accepted answers.
-    Matching is case-insensitive and ignores extra spaces; list every
-    spelling/phrasing you're willing to accept.
-  -->
   <div class="answer-block" id="answer-block">
     <p class="answer-prompt">
-      Taken together — what has the under-butler hidden, and where?
+      Taken together — what has Edwin been hiding, and where does it point you next?
     </p>
     <div class="answer-row">
       <input type="text" id="answer-input" placeholder="Type your answer…">
@@ -271,25 +251,40 @@
 
 <script>
   const ACCEPTED_ANSWERS = [
-    "the ledger is in the trunk",
-    "he hid the ledger in the trunk",
-    "under the floorboard",
-    "the key opens the trunk"
-    // add more accepted phrasings here, all lowercase
+    "wardour street",
+    "the receipt points to wardour street",
+    "laudanum and a torn map corner",
+    "he stole a piece of brunton's map and has a laudanum habit",
+    "laudanum, wardour street",
+    "the map corner and the laudanum bottle point to wardour street"
   ];
 
   const examined = new Set();
   const totalHotspots = document.querySelectorAll(".hotspot").length;
+  const progressNote = document.getElementById("progress-note");
 
   document.querySelectorAll(".hotspot").forEach(spot => {
-    spot.addEventListener("click", () => {
+    spot.setAttribute("tabindex", "0");
+    spot.setAttribute("role", "button");
+
+    const reveal = () => {
       const clueId = spot.dataset.clue;
-      document.getElementById("clue-" + clueId).classList.add("visible");
+      const card = document.getElementById("clue-" + clueId);
+      card.classList.add("visible");
       spot.classList.add("examined");
+      if (card.classList.contains("evidence")) {
+        spot.classList.add("evidence");
+      }
       examined.add(clueId);
+      progressNote.textContent = examined.size + " of " + totalHotspots + " spots examined.";
       if (examined.size === totalHotspots) {
         document.getElementById("answer-block").classList.add("ready");
       }
+    };
+
+    spot.addEventListener("click", reveal);
+    spot.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); reveal(); }
     });
   });
 
@@ -302,11 +297,14 @@
     const raw = document.getElementById("answer-input").value;
     const normalized = raw.trim().toLowerCase().replace(/\s+/g, " ");
     const feedback = document.getElementById("feedback");
-    if (ACCEPTED_ANSWERS.includes(normalized)) {
-      feedback.textContent = "Correct. Watson's notes confirm your deduction.";
+    const isCorrect = ACCEPTED_ANSWERS.some(a => normalized.includes(a)) ||
+                       normalized.includes("wardour") ||
+                       (normalized.includes("laudanum") && normalized.includes("map"));
+    if (isCorrect) {
+      feedback.textContent = "Correct. Present the bottle and the receipt together, and Edwin will have nowhere left to stand.";
       feedback.className = "feedback correct";
     } else {
-      feedback.textContent = "Not quite — examine the clues again.";
+      feedback.textContent = "Not quite — look again at what the floor and the drawers gave up.";
       feedback.className = "feedback incorrect";
     }
   }
